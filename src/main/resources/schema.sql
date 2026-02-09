@@ -38,3 +38,33 @@ CREATE TABLE meal_log (
     updated_at DATETIME2,
     CONSTRAINT fk_meal_log_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='water_intake' AND xtype='U')
+CREATE TABLE water_intake (
+    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    amount_ml INT NOT NULL,
+    created_at DATETIME2 NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME2,
+    CONSTRAINT fk_water_intake_user FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='workout_log' AND xtype='U')
+CREATE TABLE workout_log (
+    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    exercise_name NVARCHAR(255),
+    duration_minutes INT,
+    calories_burned DECIMAL(6,2),
+    created_at DATETIME2 NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME2,
+    CONSTRAINT fk_workout_log_user FOREIGN KEY (user_id) REFERENCES users(id)
+);
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='recommendations' AND xtype='U')
+CREATE TABLE recommendations (
+    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    recommendation_text NVARCHAR(MAX),
+    generated_at DATETIME2 NOT NULL DEFAULT GETDATE(),
+    CONSTRAINT fk_recommendations_user FOREIGN KEY (user_id) REFERENCES users(id)
+);

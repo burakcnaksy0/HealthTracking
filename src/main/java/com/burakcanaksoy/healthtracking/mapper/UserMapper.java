@@ -1,9 +1,6 @@
 package com.burakcanaksoy.healthtracking.mapper;
 
 import com.burakcanaksoy.healthtracking.model.User;
-
-import java.util.ArrayList;
-import java.util.List;
 import com.burakcanaksoy.healthtracking.model.enums.ActivityLevel;
 import com.burakcanaksoy.healthtracking.model.enums.Goal;
 import com.burakcanaksoy.healthtracking.model.enums.Role;
@@ -60,15 +57,4 @@ public class UserMapper {
         return response;
     }
 
-    public List<UserResponse> toResponseList(List<User> userList){
-        List<UserResponse> responseList = new ArrayList<>();
-
-        if (userList.isEmpty()){
-            return responseList;
-        }
-        for (User user : userList){
-            responseList.add(toResponse(user));
-        }
-        return responseList;
-    }
 }

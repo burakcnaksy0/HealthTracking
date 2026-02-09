@@ -19,6 +19,9 @@ public class UserService {
 
     public UserResponse getUserProfile() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (user == null ){
+            throw new NullPointerException("Unauthorized access");
+        }
         return userMapper.toResponse(user);
     }
 }

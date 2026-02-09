@@ -1,6 +1,6 @@
 package com.burakcanaksoy.healthtracking.mapper;
 
-import com.burakcanaksoy.healthtracking.dto.NutritionData;
+import com.burakcanaksoy.healthtracking.data.NutritionData;
 import com.burakcanaksoy.healthtracking.model.MealLog;
 import com.burakcanaksoy.healthtracking.model.User;
 import com.burakcanaksoy.healthtracking.model.enums.MealTime;
@@ -16,7 +16,6 @@ import java.math.RoundingMode;
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class NutritionMapper {
 

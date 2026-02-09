@@ -1,4 +1,4 @@
-package com.burakcanaksoy.healthtracking.dto;
+package com.burakcanaksoy.healthtracking.data;
 
 import lombok.Builder;
 import lombok.Data;
