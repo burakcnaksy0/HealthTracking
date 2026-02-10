@@ -1,6 +1,7 @@
 package com.burakcanaksoy.healthtracking.model;
 
 import com.burakcanaksoy.healthtracking.model.enums.ActivityLevel;
+import com.burakcanaksoy.healthtracking.model.enums.Gender;
 import com.burakcanaksoy.healthtracking.model.enums.Goal;
 import com.burakcanaksoy.healthtracking.model.enums.Role;
 import lombok.AllArgsConstructor;
@@ -35,6 +36,7 @@ public class User implements UserDetails {
     private String email;
     private String password;
     private int age;
+    private Gender gender;
     private BigDecimal weight;
     private BigDecimal height;
     private Goal goal;

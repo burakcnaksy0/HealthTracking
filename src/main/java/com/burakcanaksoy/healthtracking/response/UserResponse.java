@@ -18,6 +18,7 @@ public class UserResponse {
     private int age;
     private BigDecimal height;
     private BigDecimal weight;
+    private String gender;
     private String goal;
     private String activityLevel;
 }

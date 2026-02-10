@@ -19,6 +19,23 @@ services:
       retries: 10
       start_period: 10s
 
+  app:
+    build: .
+    container_name: health-tracking-app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://mssql:1433;databaseName=health-tracking-db;encrypt=true;trustServerCertificate=true
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - LLM_API_KEY=${LLM_API_KEY}
+      - LLM_MODEL=${LLM_MODEL}
+      - LLM_URL=${LLM_URL}
+    depends_on:
+      mssql:
+        condition: service_healthy
+    networks:
+      - country-network
 volumes:
   mssql_data:
     driver: local

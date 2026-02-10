@@ -1,5 +1,7 @@
 package com.burakcanaksoy.healthtracking.request;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,10 +12,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoginRequest {
-    @jakarta.validation.constraints.NotBlank(message = "Email cannot be blank")
-    @jakarta.validation.constraints.Email(message = "Invalid email format")
+    @NotBlank(message = "Email cannot be blank")
+    @Email(message = "Invalid email format")
     private String email;
 
-    @jakarta.validation.constraints.NotBlank(message = "Password cannot be blank")
+    @NotBlank(message = "Password cannot be blank")
     private String password;
 }

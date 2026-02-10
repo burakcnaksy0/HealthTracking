@@ -2,6 +2,7 @@ package com.burakcanaksoy.healthtracking.mapper;
 
 import com.burakcanaksoy.healthtracking.model.User;
 import com.burakcanaksoy.healthtracking.model.enums.ActivityLevel;
+import com.burakcanaksoy.healthtracking.model.enums.Gender;
 import com.burakcanaksoy.healthtracking.model.enums.Goal;
 import com.burakcanaksoy.healthtracking.model.enums.Role;
 import com.burakcanaksoy.healthtracking.request.RegisterRequest;
@@ -21,9 +22,11 @@ public class UserMapper {
     public User mapToUser(RegisterRequest request) {
         Goal goalEnum;
         ActivityLevel activityLevelEnum;
+        Gender genderEnum;
         try {
             goalEnum = Goal.valueOf(request.getGoal());
             activityLevelEnum = ActivityLevel.valueOf(request.getActivityLevel());
+            genderEnum = Gender.valueOf(request.getGender());
         } catch (IllegalArgumentException e) {
             log.error("Invalid enum value provided for goal or activity level");
             throw new RuntimeException("Invalid Goal or Activity Level");
@@ -39,6 +42,7 @@ public class UserMapper {
                 .goal(goalEnum)
                 .activityLevel(activityLevelEnum)
                 .age(request.getAge())
+                .gender(genderEnum)
                 .role(Role.ROLE_USER)
                 .build();
     }
@@ -49,6 +53,7 @@ public class UserMapper {
         response.setUsername(user.getUsername());
         response.setEmail(user.getEmail());
         response.setAge(user.getAge());
+        response.setGender(user.getGender().toString());
         response.setGoal(user.getGoal().toString());
         response.setActivityLevel(user.getActivityLevel().toString());
         response.setHeight(user.getHeight());

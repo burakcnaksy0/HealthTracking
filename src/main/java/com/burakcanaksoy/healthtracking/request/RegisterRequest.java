@@ -30,6 +30,9 @@ public class RegisterRequest {
     @Min(value = 18, message = "Age must be at least 18")
     private int age;
 
+    @NotBlank(message = "Gender cannot be blank")
+    private String gender;
+
     @NotNull(message = "Weight is required")
     @DecimalMin(value = "30.0", message = "Weight must be at least 30kg")
     private BigDecimal weight;

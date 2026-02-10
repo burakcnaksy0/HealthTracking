@@ -4,10 +4,12 @@ import com.burakcanaksoy.healthtracking.mapper.WorkoutLogMapper;
 import com.burakcanaksoy.healthtracking.model.ExerciseType;
 import com.burakcanaksoy.healthtracking.model.User;
 import com.burakcanaksoy.healthtracking.model.WorkoutLog;
+import com.burakcanaksoy.healthtracking.model.enums.Gender;
 import com.burakcanaksoy.healthtracking.repository.ExerciseTypeRepository;
 import com.burakcanaksoy.healthtracking.repository.WorkoutLogRepository;
 import com.burakcanaksoy.healthtracking.request.WorkoutLogRequest;
 import com.burakcanaksoy.healthtracking.response.WorkoutLogResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@Slf4j
 public class WorkoutLogService {
     private final WorkoutLogRepository workoutLogRepository;
     private final ExerciseTypeRepository exerciseTypeRepository;
@@ -50,6 +53,26 @@ public class WorkoutLogService {
         WorkoutLog savedLog = workoutLogRepository.save(workoutLog);
 
         return workoutLogMapper.toResponse(savedLog);
+    }
+    public BigDecimal calculateBMH(User user){
+        if (user.getHeight() == null || user.getWeight() == null){
+            return BigDecimal.ZERO;
+        }
+        double weight = user.getWeight().doubleValue();
+        double height = user.getHeight().doubleValue();
+        int age = user.getAge();
+
+        double bmr = 0;
+
+        if (Gender.MALE.equals(user.getGender())){
+            bmr = 66.5 + (13.75 * weight) + (5.003 * height) - (6.755 * age);
+        } else if (Gender.FEMALE.equals(user.getGender())) {
+            bmr = 655.1 + (9.563 * weight) + (1.850 * height) - (4.676 * age);
+        }else{
+            return BigDecimal.ZERO;
+        }
+        log.info("User BMH : {}", bmr);
+        return BigDecimal.valueOf(bmr).setScale(2,RoundingMode.HALF_UP);
     }
 
     private BigDecimal calculateCalories(BigDecimal met, BigDecimal weight, int durationMinutes) {

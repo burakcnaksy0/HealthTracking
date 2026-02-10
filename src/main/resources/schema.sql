@@ -8,6 +8,7 @@ CREATE TABLE users (
     age INT,
     weight DECIMAL(5,2),
     height DECIMAL(5,2),
+    gender NVARCHAR(20),
     goal NVARCHAR(50),
     activity_level NVARCHAR(50),
     role NVARCHAR(20) NOT NULL,
@@ -31,9 +32,9 @@ CREATE TABLE meal_log (
     calories DECIMAL(6,2),
     amount DECIMAL(5,2),
     unit NVARCHAR(50),
-    protein DECIMAL(5,2),
-    carbs DECIMAL(5,2),
-    fat DECIMAL(5,2),
+    protein DECIMAL(6,2),
+    carbs DECIMAL(6,2),
+    fat DECIMAL(6,2),
     created_at DATETIME2 NOT NULL DEFAULT GETDATE(),
     updated_at DATETIME2,
     CONSTRAINT fk_meal_log_user FOREIGN KEY (user_id) REFERENCES users(id)
@@ -60,6 +61,7 @@ CREATE TABLE workout_log (
     updated_at DATETIME2,
     CONSTRAINT fk_workout_log_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='recommendations' AND xtype='U')
 CREATE TABLE recommendations (
     id BIGINT IDENTITY(1,1) PRIMARY KEY,
@@ -67,4 +69,28 @@ CREATE TABLE recommendations (
     recommendation_text NVARCHAR(MAX),
     generated_at DATETIME2 NOT NULL DEFAULT GETDATE(),
     CONSTRAINT fk_recommendations_user FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='remainders' AND xtype='U')
+CREATE TABLE remainders (
+   id BIGINT IDENTITY(1,1) PRIMARY KEY,
+   user_id BIGINT NOT NULL,
+   remainder_text NVARCHAR(MAX),
+   generated_at DATETIME2 NOT NULL DEFAULT GETDATE(),
+   CONSTRAINT fk_remainders_user FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='reports' AND xtype='U')
+CREATE TABLE reports (
+   id BIGINT IDENTITY(1,1) PRIMARY KEY,
+   user_id BIGINT NOT NULL,
+   report_text NVARCHAR(MAX),
+   total_calories_in DECIMAL(6,2),
+   total_calories_out DECIMAL(6,2),
+   average_protein DECIMAL(6,2),
+   average_carb DECIMAL(6,2),
+   average_fat DECIMAL(6,2),
+   average_water DECIMAL(6,2),
+   generated_at DATETIME2 NOT NULL DEFAULT GETDATE(),
+   CONSTRAINT fk_reports_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
