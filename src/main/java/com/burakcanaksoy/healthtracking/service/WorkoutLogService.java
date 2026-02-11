@@ -65,9 +65,9 @@ public class WorkoutLogService {
         double bmr = 0;
 
         if (Gender.MALE.equals(user.getGender())){
-            bmr = 66.5 + (13.75 * weight) + (5.003 * height) - (6.755 * age);
+            bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age);
         } else if (Gender.FEMALE.equals(user.getGender())) {
-            bmr = 655.1 + (9.563 * weight) + (1.850 * height) - (4.676 * age);
+            bmr = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
         }else{
             return BigDecimal.ZERO;
         }

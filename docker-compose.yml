@@ -19,6 +19,18 @@ services:
       retries: 10
       start_period: 10s
 
+  activemq:
+    image: rmohr/activemq:latest
+    container_name: health-tracking-activemq
+    ports:
+      - "61616:61616"
+      - "8161:8161"
+    environment:
+      - ACTIVEMQ_ADMIN_LOGIN=admin
+      - ACTIVEMQ_ADMIN_PASSWORD=admin
+    networks:
+      - country-network
+
   app:
     build: .
     container_name: health-tracking-app
@@ -31,11 +43,18 @@ services:
       - LLM_API_KEY=${LLM_API_KEY}
       - LLM_MODEL=${LLM_MODEL}
       - LLM_URL=${LLM_URL}
+      # ActiveMQ Config for Docker environment
+      - SPRING_ACTIVEMQ_BROKER_URL=tcp://activemq:61616
+      - SPRING_ACTIVEMQ_USER=admin
+      - SPRING_ACTIVEMQ_PASSWORD=admin
     depends_on:
       mssql:
         condition: service_healthy
+      activemq:
+        condition: service_started
     networks:
       - country-network
+
 volumes:
   mssql_data:
     driver: local

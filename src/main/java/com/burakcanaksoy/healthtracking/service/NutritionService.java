@@ -1,5 +1,6 @@
 package com.burakcanaksoy.healthtracking.service;
 
+import com.burakcanaksoy.healthtracking.config.NutritionConfig;
 import com.burakcanaksoy.healthtracking.data.NutritionData;
 import com.burakcanaksoy.healthtracking.mapper.NutritionMapper;
 import com.burakcanaksoy.healthtracking.model.MealLog;
@@ -24,20 +25,17 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class NutritionService {
-
-    @Value("${address.base.url}")
-    private String baseUrl;
-
     private final NutritionRepository nutritionRepository;
     private final RestTemplate restTemplate;
     private final NutritionMapper nutritionMapper;
     private final ObjectMapper objectMapper;
+    private final NutritionConfig nutritionConfig;
 
     public NutritionResponse logNutrition(NutritionRequest request) {
         User user = getAuthenticatedUser();
         log.info("Authenticated user: {} ({})", user.getUsername(), user.getEmail());
 
-        String url = UriComponentsBuilder.fromUriString(baseUrl)
+        String url = UriComponentsBuilder.fromUriString(nutritionConfig.getBaseUrl())
                 .queryParam("search_terms", request.getFoodName())
                 .queryParam("search_simple", 1)
                 .queryParam("action", "process")

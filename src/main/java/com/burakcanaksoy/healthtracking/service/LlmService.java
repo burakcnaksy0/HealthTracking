@@ -1,5 +1,7 @@
 package com.burakcanaksoy.healthtracking.service;
 
+import com.burakcanaksoy.healthtracking.config.LlmConfig;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -12,38 +14,29 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class LlmService {
 
     private final RestTemplate restTemplate;
-
-    @Value("${llm.api.key}")
-    private String apiKey;
-
-    @Value("${llm.model}")
-    private String model;
-
-    @Value("${llm.url}")
-    private String apiUrl;
-
-    public LlmService(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
+    private final LlmConfig llmConfig;
 
     public String getRecommendation(String prompt) {
-        String url = apiUrl;
+        String url = llmConfig.getApiUrl();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + apiKey);
+        headers.set("Authorization", "Bearer " + llmConfig.getApiKey());
 
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("model", model);
+        requestBody.put("model", llmConfig.getModel());
 
         Map<String, String> message = new HashMap<>();
         message.put("role", "user");
         message.put("content", prompt);
 
         requestBody.put("messages", List.of(message));
+        requestBody.put("max_tokens", 500);
+        requestBody.put("temperature", 0.7);
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 

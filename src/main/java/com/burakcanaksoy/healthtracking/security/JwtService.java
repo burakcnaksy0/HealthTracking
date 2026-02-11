@@ -1,11 +1,13 @@
 package com.burakcanaksoy.healthtracking.security;
 
+import com.burakcanaksoy.healthtracking.config.JwtConfig;
 import com.burakcanaksoy.healthtracking.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,17 +21,14 @@ import java.util.function.Function;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class JwtService {
-    @Value("${jwt.secret.key}")
-    private String secretKey;
-
-    @Value("${jwt.expiration}")
-    private long jwtExpiration;
+    private final JwtConfig jwtConfig;
 
     @PostConstruct
     public void validateSecretKey() {
         try {
-            byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+            byte[] keyBytes = Decoders.BASE64.decode(jwtConfig.getSecretKey());
             if (keyBytes.length < 32) {
                 throw new IllegalArgumentException(
                         "JWT secret key must be at least 256 bits (32 bytes)");
@@ -63,7 +62,7 @@ public class JwtService {
                 .setClaims(extraClaims)
                 .setSubject(user.getEmail())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtConfig.getJwtExpiration()))
                 .signWith(getSignInKey())
                 .compact();
     }
@@ -92,7 +91,7 @@ public class JwtService {
     }
 
     private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        byte[] keyBytes = Decoders.BASE64.decode(jwtConfig.getSecretKey());
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
