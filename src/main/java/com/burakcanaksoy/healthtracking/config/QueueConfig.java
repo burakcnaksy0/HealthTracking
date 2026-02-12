@@ -9,4 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Data
 public class QueueConfig {
     private String reportQueue;
+    private String brokerUrl;
+    private String username;
+    private String password;
 }

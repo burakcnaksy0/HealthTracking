@@ -26,6 +26,9 @@ public class LlmService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Bearer " + llmConfig.getApiKey());
+        // OpenRouter recommended headers
+        headers.set("HTTP-Referer", "http://localhost:8080"); // Optional: Your site URL
+        headers.set("X-Title", "HealthTrackingApp"); // Optional: Your app name
 
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("model", llmConfig.getModel());
@@ -51,6 +54,14 @@ public class LlmService {
                     return (String) messageMap.get("content");
                 }
             }
+        } catch (org.springframework.web.client.HttpClientErrorException e) {
+            System.err.println("LLM API Error: " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
+            if (e.getStatusCode().value() == 401) {
+                return "Authentication failed. Please check your LLM API Key.";
+            } else if (e.getStatusCode().value() == 402) {
+                return "Insufficient credits. Please check your OpenRouter account balance.";
+            }
+            return "Error generating recommendation: " + e.getMessage();
         } catch (Exception e) {
             e.printStackTrace();
             return "Unable to generate recommendation at this time. Please try again later.";
