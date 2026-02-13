@@ -1,27 +1,46 @@
 services:
   mssql:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: health-tracking-container
+    container_name: health-tracking-database
+    restart: unless-stopped
     environment:
       - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=Admin123!
+      - MSSQL_SA_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
       - MSSQL_PID=Developer
     ports:
       - "1440:1433"
     volumes:
       - mssql_data:/var/opt/mssql
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     networks:
       - country-network
     healthcheck:
-      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "Admin123!" -C -Q "SELECT 1" || exit 1
+      test: [ "CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' || exit 1" ]
       interval: 10s
       timeout: 3s
       retries: 10
       start_period: 10s
 
+  db-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: health-tracking-db-init
+    depends_on:
+      mssql:
+        condition: service_healthy
+    volumes:
+      - ./init-db.sql:/init-db.sql
+    environment:
+      - MSSQL_SA_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - SQLCMDPASSWORD=${SPRING_DATASOURCE_PASSWORD}
+    command: >
+      /bin/bash -c " /opt/mssql-tools18/bin/sqlcmd -S mssql -U sa -C -i /init-db.sql "
+    networks:
+      - country-network
+
   activemq:
-    image: rmohr/activemq:latest
+    image: symptoma/activemq:latest
     container_name: health-tracking-activemq
+    restart: unless-stopped
     ports:
       - "61616:61616"
       - "8161:8161"
@@ -33,18 +52,18 @@ services:
 
   app:
     build: .
-    container_name: health-tracking-app
+    container_name: health-tracking-backend
+    restart: unless-stopped
     ports:
       - "8080:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:sqlserver://mssql:1433;databaseName=health-tracking-db;encrypt=true;trustServerCertificate=true
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://health-tracking-database:1433;databaseName=health-tracking-db;encrypt=true;trustServerCertificate=true
       - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
       - LLM_API_KEY=${LLM_API_KEY}
       - LLM_MODEL=${LLM_MODEL}
       - LLM_URL=${LLM_URL}
-      # ActiveMQ Config for Docker environment
-      - SPRING_ACTIVEMQ_BROKER_URL=tcp://activemq:61616
+      - SPRING_ACTIVEMQ_BROKER_URL=tcp://health-tracking-activemq:61616
       - SPRING_ACTIVEMQ_USER=admin
       - SPRING_ACTIVEMQ_PASSWORD=admin
     depends_on:
@@ -52,13 +71,16 @@ services:
         condition: service_healthy
       activemq:
         condition: service_started
+      db-init:
+        condition: service_completed_successfully
     networks:
       - country-network
 
 volumes:
   mssql_data:
-    driver: local
+
 
 networks:
   country-network:
+    name: country-network
     driver: bridge

@@ -43,6 +43,7 @@ public class JmsConfig {
         return pooled;
     }
 
+    // ReportMessage -> MessageConverter -> JSON -> TextMessage -> ActiveMQ
     @Bean
     public MessageConverter converter() {
         JacksonJsonMessageConverter converter = new JacksonJsonMessageConverter();
